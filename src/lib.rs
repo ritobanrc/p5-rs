@@ -33,7 +33,6 @@ mod tests {
             fn setup(&mut self, p5: &mut P5) {
                 p5.background((1., 0., 0.));
             }
-            fn draw(&mut self, _p5: &mut P5) {}
         }
 
         BackgroundTest.run();
@@ -60,10 +59,9 @@ mod tests {
 
         impl Sketch for EllipseTest {
             fn setup(&mut self, p5: &mut P5) {
-                p5.background(255);
+                p5.background(220);
                 p5.ellipse(200., 200., 100., 50.);
             }
-            fn draw(&mut self, _p5: &mut P5) {}
         }
 
         EllipseTest.run();
@@ -75,12 +73,60 @@ mod tests {
 
         impl Sketch for LineTest {
             fn setup(&mut self, p5: &mut P5) {
-                p5.background(255);
+                p5.background(220);
                 p5.line(20., 20., 380., 380.);
             }
-            fn draw(&mut self, _p5: &mut P5) {}
         }
 
         LineTest.run();
+    }
+
+    #[test]
+    fn point() {
+        struct PointTest;
+
+        impl Sketch for PointTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.background(220);
+                for i in 0..20u8 {
+                    p5.stroke_weight(f32::from(i));
+                    p5.point(f32::from(i) * 20. + 10., 200.);
+                }
+            }
+        }
+
+        PointTest.run();
+    }
+
+    #[test]
+    fn stroke() {
+        struct StrokeTest;
+
+        impl Sketch for StrokeTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.background(220);
+                for i in 0..5u8 {
+                    for j in 0..5u8 {
+                        let (i, j) = (f32::from(i), f32::from(j));
+
+                        // pick a row to test `no_stroke` on
+                        if j == 3. {
+                            p5.no_stroke();
+                        } else {
+                            p5.stroke_weight(i);
+                        }
+
+                        let x = i * 80. + 35.;
+                        let y = j * 80. + 35.;
+
+                        //p5.stroke((0., i, j));
+
+                        p5.circle(x, y, 60.);
+                    }
+                }
+            }
+        }
+
+        StrokeTest.run();
     }
 }

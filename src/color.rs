@@ -12,6 +12,7 @@ impl Color {
     }
 }
 
+#[allow(dead_code)]
 enum ColorModel {
     RGB,
     HSL,

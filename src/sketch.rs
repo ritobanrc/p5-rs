@@ -3,8 +3,15 @@ use crate::P5;
 use minifb::{Key, Window, WindowOptions};
 
 pub trait Sketch {
-    fn setup(&mut self, p5: &mut P5);
-    fn draw(&mut self, p5: &mut P5);
+    /// The setup() function is called once when the program starts. It's used to define
+    /// initial environment properties such as screen size and background color and to load
+    /// media such as images and fonts as the program starts. There can only be one setup()
+    /// function for each program and it shouldn't be called again after its initial execution.
+    ///
+    /// The default implementation of [`setup`](crate::sketch::Sketch::setup) is empty.
+    fn setup(&mut self, _p5: &mut P5) {}
+
+    fn draw(&mut self, _p5: &mut P5) {}
 
     fn title(&self) -> &'static str {
         "p5-rs Window"

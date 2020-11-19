@@ -17,10 +17,24 @@ pub trait P5 {
     fn circle(&mut self, x: f32, y: f32, d: f32);
 
     /// Draws a line (a direct path between two points) to the screen, with a default width of 1
-    /// pixel. This width can be modified by using the strokeWeight() function. A line cannot be
+    /// pixel. This width can be modified by using the stroke_weight() function. A line cannot be
     /// filled, therefore the fill() function will not affect the color of a line. So to color a
     /// line, use the stroke() function.
     fn line(&mut self, x1: f32, y1: f32, x2: f32, y2: f32);
+
+    /// Draws a point, a coordinate in space at the dimension of one pixel. The first parameter
+    /// is the horizontal value for the point, the second param is the vertical value for the
+    /// point. The color of the point is changed with the stroke() function. The size of the
+    /// point can be changed with the stroke_weight() function.
+    fn point(&mut self, x: f32, y: f32);
+
+    /// Sets the width of the stroke used for lines, points and the border around shapes. All
+    /// widths are set in units of pixels.
+    fn stroke_weight(&mut self, weight: f32);
+
+    /// Disables drawing the stroke (outline). If both [`no_stroke`](crate::p5::P5::no_stroke)
+    /// and no_fill are called, nothing will be drawn to the screen.
+    fn no_stroke(&mut self);
 
     fn get_data(&self) -> &[u32];
 }
