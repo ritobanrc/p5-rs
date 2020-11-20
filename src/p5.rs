@@ -36,5 +36,61 @@ pub trait P5 {
     /// and no_fill are called, nothing will be drawn to the screen.
     fn no_stroke(&mut self);
 
+    fn stroke<C: IntoColor>(&mut self, color: C);
+
+    /// Draws a quad on the canvas. A quad is a quadrilateral, a four sided polygon. It is similar
+    /// to a rectangle, but the angles between its edges are not constrained to ninety degrees. The
+    /// first pair of parameters (x1,y1) sets the first vertex and the subsequent pairs should
+    /// proceed clockwise or counter-clockwise around the defined shape.
+    fn quad(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, x4: f32, y4: f32);
+
+    /// Draws a rectangle on the canvas. A rectangle is a four-sided closed shape with every angle
+    /// at ninety degrees. By default, the first two parameters set the location of the upper-left
+    /// corner, the third sets the width, and the fourth sets the height. The way these parameters
+    /// are interpreted, may be changed with the rect_mode() function.
+    ///
+    /// The final parameter, `rounding` specificies how the corners of the rectangle. If `None`, no
+    /// rounding will be applied, otherwise, the rounding for each corner is specified in the
+    /// `RectRounding` struct.
+    fn rect(&mut self, x: f32, y: f32, w: f32, h: f32, rounding: Option<RectRounding>);
+
+    fn rect_mode(&mut self, mode: RectMode);
+
+    fn no_fill(&mut self);
+
     fn get_data(&self) -> &[u32];
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq)]
+pub enum RectMode {
+    Corner,
+    Corners,
+    Center,
+    Radius,
+}
+
+/// Represents the rounding for each corner of a rectangle
+pub struct RectRounding {
+    pub tl: f32,
+    pub tr: f32,
+    pub br: f32,
+    pub bl: f32,
+}
+
+impl RectRounding {
+    /// Creates a [`RectRounding`](crate::p5::RectRounding) object with the rounding for each
+    /// corner. Returns an option for ergonomics with the `rect` method, is always guaranteed
+    /// to be `Some`.
+    pub fn new(tl: f32, tr: f32, br: f32, bl: f32) -> Option<Self> {
+        Some(RectRounding { tl, tr, br, bl })
+    }
+
+    /// Creates a [`RectRounding`](crate::p5::RectRounding) object with the same rounding for each
+    /// corner.
+    pub fn equal(radius: f32) -> Option<Self> {
+        Some(
+            Self::new(radius, radius, radius, radius)
+                .expect("RectRounding::new should never return None!"),
+        )
+    }
 }

@@ -5,6 +5,7 @@ mod sketch;
 
 pub use color::{Color, IntoColor};
 pub use p5::P5 as P5Trait;
+pub use p5::{RectMode, RectRounding};
 pub use sketch::Sketch;
 
 type P5 = backend::raqote::RaqoteP5;
@@ -113,13 +114,13 @@ mod tests {
                         if j == 3. {
                             p5.no_stroke();
                         } else {
-                            p5.stroke_weight(i);
+                            p5.stroke_weight(i * 2.);
                         }
 
                         let x = i * 80. + 35.;
                         let y = j * 80. + 35.;
 
-                        //p5.stroke((0., i, j));
+                        p5.stroke((0., x / 400., y / 400.));
 
                         p5.circle(x, y, 60.);
                     }
@@ -128,5 +129,62 @@ mod tests {
         }
 
         StrokeTest.run();
+    }
+
+    #[test]
+    fn quad() {
+        struct QuadTest;
+
+        impl Sketch for QuadTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.background(220);
+                for i in 0..3u8 {
+                    let x = f32::from(i) * 100.;
+                    p5.stroke_weight(f32::from(i));
+                    p5.quad(38. + x, 31., 86. + x, 20., 69. + x, 63., 30. + x, 76.);
+                }
+            }
+        }
+
+        QuadTest.run();
+    }
+
+    #[test]
+    fn rect() {
+        struct RectTest;
+
+        impl Sketch for RectTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.background(220);
+
+                p5.rect(30., 20., 55., 55., None);
+                p5.rect(100., 20., 75., 55., None);
+                p5.rect(200., 20., 55., 55., RectRounding::equal(20.));
+                p5.rect(300., 20., 55., 55., RectRounding::new(20., 15., 5., 30.));
+
+                p5.rect_mode(RectMode::Corners);
+
+                p5.rect(30., 100., 85., 155., None);
+                p5.rect(100., 100., 175., 155., None);
+                p5.rect(200., 100., 255., 155., RectRounding::equal(20.));
+                p5.rect(300., 100., 355., 155., RectRounding::new(20., 15., 5., 30.));
+
+                p5.rect_mode(RectMode::Center);
+
+                p5.rect(30., 200., 55., 55., None);
+                p5.rect(100., 200., 75., 55., None);
+                p5.rect(200., 200., 55., 55., RectRounding::equal(20.));
+                p5.rect(300., 200., 55., 55., RectRounding::new(20., 15., 5., 30.));
+
+                p5.rect_mode(RectMode::Radius);
+
+                p5.rect(30., 300., 25., 25., None);
+                p5.rect(100., 300., 35., 25., None);
+                p5.rect(200., 300., 25., 25., RectRounding::equal(20.));
+                p5.rect(300., 300., 25., 25., RectRounding::new(20., 15., 5., 30.));
+            }
+        }
+
+        RectTest.run();
     }
 }
