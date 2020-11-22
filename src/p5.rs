@@ -56,6 +56,23 @@ pub trait P5 {
 
     fn rect_mode(&mut self, mode: RectMode);
 
+    /// Draws a square to the screen. A square is a four-sided shape with every angle at ninety
+    /// degrees, and equal side size. This function is a special case of the rect() function, where
+    /// the width and height are the same, and the parameter is called "s" for side size. By
+    /// default, the first two parameters set the location of the upper-left corner, the third sets
+    /// the side size of the square. The way these parameters are interpreted, may be changed with
+    /// the rect_mode() function.
+    fn square(&mut self, x: f32, y: f32, s: f32, rounding: Option<RectRounding>) {
+        self.rect(x, y, s, s, rounding)
+    }
+
+    /// Draws a trangle to the canvas. A triangle is a shape created by connecting three points.
+    /// The first two arguments specify the first point, the middle two arguments specify the
+    /// second point, and the last two arguments specify the third point.
+    fn triangle(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32);
+
+    fn reset_matrix(&mut self);
+
     fn no_fill(&mut self);
 
     fn get_data(&self) -> &[u32];

@@ -187,4 +187,18 @@ mod tests {
 
         RectTest.run();
     }
+
+    #[test]
+    fn triangle() {
+        struct TriangleTest;
+
+        impl Sketch for TriangleTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.background(220);
+                p5.triangle(30., 75., 58., 20., 86., 75.);
+            }
+        }
+
+        TriangleTest.run();
+    }
 }

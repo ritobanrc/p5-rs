@@ -227,6 +227,21 @@ impl P5 for RaqoteP5 {
         self.rect_mode = mode;
     }
 
+    fn triangle(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32) {
+        let mut pb = PathBuilder::new();
+        pb.move_to(x1, y1);
+        pb.line_to(x2, y2);
+        pb.line_to(x3, y3);
+        pb.close();
+        let path = pb.finish();
+
+        self.draw_path(path);
+    }
+
+    fn reset_matrix(&mut self) {
+        todo!()
+    }
+
     fn no_fill(&mut self) {
         self.fill_color = None;
     }
