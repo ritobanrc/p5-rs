@@ -21,6 +21,7 @@ pub struct RaqoteP5 {
     transform: Transform2D<f32, UnknownUnit, UnknownUnit>,
     /// The variable frame_count contains the number of frames that have been displayed since the program started. Inside setup() the value is 0, after the first iteration of draw it is 1, etc.
     pub frame_count: usize,
+    pub frame_rate: f32,
 }
 
 impl From<crate::Color> for raqote::Color {
@@ -39,6 +40,7 @@ impl RaqoteP5 {
             rect_mode: RectMode::Corner,
             transform: Transform2D::identity(),
             frame_count: 0,
+            frame_rate: 60., // TODO: p5js docs say the default framerate is based on the monitor refresh rate, but we hard code it to be 60.
         }
     }
 
@@ -262,6 +264,10 @@ impl P5 for RaqoteP5 {
 
     fn no_fill(&mut self) {
         self.fill_color = None;
+    }
+
+    fn frame_rate(&mut self, fps: f32) {
+        self.frame_rate = fps;
     }
 
     fn get_data(&self) -> &[u32] {

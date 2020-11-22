@@ -43,7 +43,9 @@ pub trait Sketch {
         self.setup(&mut p5);
 
         // Limit to max ~60 fps update rate
-        window.limit_update_rate(Some(std::time::Duration::from_micros(16600)));
+        window.limit_update_rate(Some(std::time::Duration::from_micros(
+            (1_000_000. / p5.frame_rate) as u64,
+        )));
 
         while window.is_open() && !window.is_key_down(Key::Escape) {
             // TODO: This isn't specified in the p5 trait, why can we assume it exists?

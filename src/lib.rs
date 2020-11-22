@@ -231,4 +231,48 @@ mod tests {
 
         MatrixTest.run();
     }
+
+    #[test]
+    fn transforms() {
+        struct TransformsTest;
+
+        impl Sketch for TransformsTest {
+            fn setup(&mut self, p5: &mut P5) {
+                p5.frame_rate(10.);
+            }
+
+            fn draw(&mut self, p5: &mut P5) {
+                let step = (p5.frame_count % 20) as f32;
+                p5.background(200);
+                p5.rect_mode(RectMode::Center);
+
+                p5.translate(40., 50.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                p5.scale(1. / step);
+                p5.translate(200., 50.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                let angle = step / 20. * 2. * std::f32::consts::PI;
+                p5.rotate(angle);
+                p5.translate(300., 50.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                p5.shear_x(angle);
+                p5.translate(200., 200.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                p5.shear_y(angle);
+                p5.translate(200., 300.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+            }
+        }
+
+        TransformsTest.run();
+    }
 }

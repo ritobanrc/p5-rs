@@ -86,6 +86,87 @@ pub trait P5 {
     /// rapidly fly off the screen.
     fn apply_matrix(&mut self, m11: f32, m12: f32, m21: f32, m22: f32, m31: f32, m32: f32);
 
+    /// Specifies an amount to displace objects within the display window. The x parameter specifies
+    /// left/right translation, the y parameter specifies up/down translation.
+
+    /// Transformations are cumulative and apply to everything that happens after and subsequent calls
+    /// to the function accumulates the effect. For example, calling translate(50, 0) and then
+    /// translate(20, 0) is the same as translate(70, 0). If translate() is called within draw(), the
+    /// transformation is reset when the loop begins again. This function can be further controlled by
+    /// using push() and pop().
+    fn translate(&mut self, x: f32, y: f32) {
+        self.apply_matrix(1., 0., 0., 1., x, y);
+    }
+
+    /// Rotates a shape by the amount specified by the angle parameter.
+    ///
+    /// Objects are always rotated around their relative position to the origin and positive numbers
+    /// rotate objects in a clockwise direction. Transformations apply to everything that happens
+    /// after and subsequent calls to the function accumulates the effect. For example, calling
+    /// rotate(HALF_PI) and then rotate(HALF_PI) is the same as rotate(PI). All tranformations are
+    /// reset when draw() begins again.
+    fn rotate(&mut self, angle: f32) {
+        // TODO: Angle mode
+        let cos_a = angle.cos();
+        let sin_a = angle.sin();
+        self.apply_matrix(cos_a, sin_a, -sin_a, cos_a, 0., 0.);
+    }
+
+    /// Increases or decreases the size of a shape by expanding or contracting vertices. Objects
+    /// always scale from their relative origin to the coordinate system. Scale values are
+    /// specified as decimal percentages. For example, the function call scale(2.0) increases the
+    /// dimension of a shape by 200%.
+    ///
+    /// Transformations apply to everything that happens after and subsequent calls to the function
+    /// multiply the effect. For example, calling scale(2.0) and then scale(1.5) is the same as
+    /// scale(3.0). If scale() is called within draw(), the transformation is reset when the loop
+    /// begins again.
+    fn scale(&mut self, scale: f32) {
+        self.apply_matrix(scale, 0., 0., scale, 0., 0.);
+    }
+
+    /// Shears a shape around the x-axis by the amount specified by the angle parameter. Angles
+    /// should be specified in the current angleMode. Objects are always sheared around their
+    /// relative position to the origin and positive numbers shear objects in a clockwise
+    /// direction.
+    ///
+    /// Transformations apply to everything that happens after and subsequent calls to
+    /// the function accumulates the effect. For example, calling shearX(PI/2) and then
+    /// shearX(PI/2) is the same as shearX(PI). If shearX() is called within the draw(), the
+    /// transformation is reset when the loop begins again.
+    fn shear_x(&mut self, angle: f32) {
+        let mut t = angle.tan();
+        if t.abs() > 1000. {
+            t = 0.; // awful hack, but otherwise, raqote overflows when rendering.
+        }
+        self.apply_matrix(1., 0., t, 1., 0., 0.);
+    }
+
+    /// Shears a shape around the y-axis the amount specified by the angle parameter. Angles should
+    /// be specified in the current angleMode. Objects are always sheared around their relative
+    /// position to the origin and positive numbers shear objects in a clockwise direction.
+    ///
+    /// Transformations apply to everything that happens after and subsequent calls to the function
+    /// accumulates the effect. For example, calling shearY(PI/2) and then shearY(PI/2) is the same
+    /// as shearY(PI). If shearY() is called within the draw(), the transformation is reset when
+    /// the loop begins again.
+    fn shear_y(&mut self, angle: f32) {
+        let mut t = angle.tan();
+        if t.abs() > 1_000. {
+            t = 0.;
+        }
+        self.apply_matrix(1., t, 0., 1., 0., 0.);
+    }
+
+    /// Specifies the number of frames to be displayed every second. For example, the function call
+    /// frame_rate(30) will attempt to refresh 30 times a second. If the processor is not fast
+    /// enough to maintain the specified rate, the frame rate will not be achieved. The default
+    /// frame rate is 60 fps.
+    ///
+    /// TODO: detect frame rate based on monitor refresh rate like p5.js
+    /// TODO: allow for updating frame rate outside of `setup`.
+    fn frame_rate(&mut self, fps: f32);
+
     fn no_fill(&mut self);
 
     fn get_data(&self) -> &[u32];
