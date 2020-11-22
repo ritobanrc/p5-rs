@@ -1,7 +1,7 @@
 use crate::p5::{RectMode, P5};
 use crate::IntoColor;
 use crate::Sketch;
-use euclid::{point2, vec2, Angle};
+use euclid::{point2, vec2, Angle, Transform2D, UnknownUnit};
 use raqote::{DrawOptions, DrawTarget, PathBuilder, Source};
 
 /// A structure that contains all the internal state necessary for drawing with the raqote backend.
@@ -17,6 +17,10 @@ pub struct RaqoteP5 {
     stroke_weight: f32,
     /// The current [`RectMode`](crate::p5::RectMode). The default is RectMode::Corner.
     rect_mode: RectMode,
+    /// The current transformation that should be applied to shapes.
+    transform: Transform2D<f32, UnknownUnit, UnknownUnit>,
+    /// The variable frame_count contains the number of frames that have been displayed since the program started. Inside setup() the value is 0, after the first iteration of draw it is 1, etc.
+    pub frame_count: usize,
 }
 
 impl From<crate::Color> for raqote::Color {
@@ -33,10 +37,18 @@ impl RaqoteP5 {
             stroke_color: raqote::Color::new(255, 0, 0, 0),
             stroke_weight: 1.,
             rect_mode: RectMode::Corner,
+            transform: Transform2D::identity(),
+            frame_count: 0,
         }
     }
 
+    /// Draws a path correctly using the stroke weight, stroke color, fill color, etc.
+    /// attribiutes. Also transforms `path` using `self.transform` before drawing.
     fn draw_path(&mut self, path: raqote::Path) {
+        // Hack because raqote uses an old version of euclid, so we copy the data inside the
+        // transform.
+        let transform = raqote::Transform::from_row_major_array(self.transform.to_array());
+        let path = path.transform(&transform);
         if self.stroke_weight != 0.0 {
             let stroke_style = {
                 let mut s = raqote::StrokeStyle::default();
@@ -239,7 +251,13 @@ impl P5 for RaqoteP5 {
     }
 
     fn reset_matrix(&mut self) {
-        todo!()
+        self.transform = Transform2D::identity();
+    }
+
+    fn apply_matrix(&mut self, m11: f32, m12: f32, m21: f32, m22: f32, m31: f32, m32: f32) {
+        self.transform = self
+            .transform
+            .then(&Transform2D::new(m11, m12, m21, m22, m31, m32));
     }
 
     fn no_fill(&mut self) {

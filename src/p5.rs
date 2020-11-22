@@ -73,6 +73,19 @@ pub trait P5 {
 
     fn reset_matrix(&mut self);
 
+    /// Multiplies the current matrix by the one specified through the parameters. This is a
+    /// powerful operation that can perform the equivalent of translate, scale, shear and rotate
+    /// all at once. You can learn more about transformation matrices on
+    /// [Wikipedia](https://en.wikipedia.org/wiki/Transformation_matrix).
+    ///
+    /// The naming here corresponds to the [`Transform2D::new`](euclid::Transform2D::new) function,
+    /// but should be the same as the WHATWG specification used by p5.js.
+    ///
+    /// Additionally, note that the matrix is reset each frame. This is normally more natural since
+    /// you don't want transformations to add up over frames, since otherwise, the drawings would
+    /// rapidly fly off the screen.
+    fn apply_matrix(&mut self, m11: f32, m12: f32, m21: f32, m22: f32, m31: f32, m32: f32);
+
     fn no_fill(&mut self);
 
     fn get_data(&self) -> &[u32];

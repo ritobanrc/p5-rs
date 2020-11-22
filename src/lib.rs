@@ -201,4 +201,34 @@ mod tests {
 
         TriangleTest.run();
     }
+
+    #[test]
+    fn matrix() {
+        struct MatrixTest;
+
+        impl Sketch for MatrixTest {
+            fn draw(&mut self, p5: &mut P5) {
+                let step = (p5.frame_count % 20) as f32;
+                p5.background(200);
+                p5.apply_matrix(1., 0., 0., 1., 40. + step, 50.);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                p5.apply_matrix(1. / step, 0., 0., 1. / step, 200., 50.);
+                p5.rect_mode(RectMode::Center);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+
+                let angle = step / 20. * 2. * std::f32::consts::PI;
+                let cos_a = angle.cos();
+                let sin_a = angle.sin();
+                p5.apply_matrix(cos_a, sin_a, -sin_a, cos_a, 300., 50.);
+                p5.rect_mode(RectMode::Center);
+                p5.rect(0., 0., 50., 50., None);
+                p5.reset_matrix();
+            }
+        }
+
+        MatrixTest.run();
+    }
 }
