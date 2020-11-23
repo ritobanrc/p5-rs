@@ -99,7 +99,7 @@ fn create_ellipse_path(x: f32, y: f32, w: f32, h: f32) -> raqote::Path {
 
 impl P5 for RaqoteP5 {
     fn background<C: IntoColor>(&mut self, c: C) {
-        let c: raqote::Color = c.into().into();
+        let c: raqote::Color = c.into(crate::color::RGB).into();
         self.dt.clear(c.into());
     }
 
@@ -150,7 +150,7 @@ impl P5 for RaqoteP5 {
     }
 
     fn stroke<C: IntoColor>(&mut self, color: C) {
-        self.stroke_color = color.into().into();
+        self.stroke_color = color.into(crate::color::RGB).into();
     }
 
     fn quad(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, x4: f32, y4: f32) {
