@@ -167,6 +167,11 @@ pub trait P5 {
     /// TODO: allow for updating frame rate outside of `setup`.
     fn frame_rate(&mut self, fps: f32);
 
+    /// colorMode() changes the way p5.js interprets color data. By default, the parameters for
+    /// fill(), stroke(), background(), and color() are defined by values between 0 and 255
+    /// using the RGB color model.
+    fn color_mode(&mut self, mode: crate::ColorMode);
+
     fn no_fill(&mut self);
 
     fn get_data(&self) -> &[u32];

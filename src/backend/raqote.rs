@@ -1,6 +1,6 @@
 use crate::p5::{RectMode, P5};
-use crate::IntoColor;
 use crate::Sketch;
+use crate::{ColorMode, IntoColor};
 use euclid::{point2, vec2, Angle, Transform2D, UnknownUnit};
 use raqote::{DrawOptions, DrawTarget, PathBuilder, Source};
 
@@ -19,6 +19,8 @@ pub struct RaqoteP5 {
     rect_mode: RectMode,
     /// The current transformation that should be applied to shapes.
     transform: Transform2D<f32, UnknownUnit, UnknownUnit>,
+    /// The current color mode
+    color_mode: ColorMode,
     /// The variable frame_count contains the number of frames that have been displayed since the program started. Inside setup() the value is 0, after the first iteration of draw it is 1, etc.
     pub frame_count: usize,
     pub frame_rate: f32,
@@ -39,18 +41,23 @@ impl RaqoteP5 {
             stroke_weight: 1.,
             rect_mode: RectMode::Corner,
             transform: Transform2D::identity(),
+            color_mode: crate::RGB,
             frame_count: 0,
             frame_rate: 60., // TODO: p5js docs say the default framerate is based on the monitor refresh rate, but we hard code it to be 60.
         }
     }
 
-    /// Draws a path correctly using the stroke weight, stroke color, fill color, etc.
-    /// attribiutes. Also transforms `path` using `self.transform` before drawing.
-    fn draw_path(&mut self, path: raqote::Path) {
+    fn transform_path(&self, path: raqote::Path) -> raqote::Path {
         // Hack because raqote uses an old version of euclid, so we copy the data inside the
         // transform.
         let transform = raqote::Transform::from_row_major_array(self.transform.to_array());
-        let path = path.transform(&transform);
+        path.transform(&transform)
+    }
+
+    /// Draws a path correctly using the stroke weight, stroke color, fill color, etc.
+    /// attribiutes. Also transforms `path` using `self.transform` before drawing.
+    fn draw_path(&mut self, path: raqote::Path) {
+        let path = self.transform_path(path);
         if self.stroke_weight != 0.0 {
             let stroke_style = {
                 let mut s = raqote::StrokeStyle::default();
@@ -99,7 +106,7 @@ fn create_ellipse_path(x: f32, y: f32, w: f32, h: f32) -> raqote::Path {
 
 impl P5 for RaqoteP5 {
     fn background<C: IntoColor>(&mut self, c: C) {
-        let c: raqote::Color = c.into(crate::color::RGB).into();
+        let c: raqote::Color = c.into_color(self.color_mode).into();
         self.dt.clear(c.into());
     }
 
@@ -133,12 +140,23 @@ impl P5 for RaqoteP5 {
     }
 
     fn point(&mut self, x: f32, y: f32) {
-        let path = create_ellipse_path(x, y, self.stroke_weight, self.stroke_weight);
-        self.dt.fill(
-            &path,
-            &Source::Solid(self.stroke_color.into()),
-            &DrawOptions::default(),
-        );
+        if self.stroke_weight == 1. && self.stroke_color.a() == 255 {
+            let point = self.transform.transform_point(point2(x, y));
+            let idx = point.y as i32 * self.dt.width() + point.x as i32;
+            // Safety: A struct with only one field has the same layout as that field. A raqote::Color is just a u32.
+            self.dt.get_data_mut()[idx as usize] =
+                unsafe { std::mem::transmute(self.stroke_color) };
+        } else {
+            // TODO: Using an ellipse here is _incredibly_ innefficient for small strokeweights.
+            // Additionally, when alpha != 1, but strokeweight == 1, it may even be incorrect, as
+            // anti-aliasing would cause it to be drawn less brightly than it should be.
+            let path = create_ellipse_path(x, y, self.stroke_weight, self.stroke_weight);
+            self.dt.fill(
+                &self.transform_path(path),
+                &Source::Solid(self.stroke_color.into()),
+                &DrawOptions::default(),
+            );
+        }
     }
 
     fn stroke_weight(&mut self, weight: f32) {
@@ -150,7 +168,7 @@ impl P5 for RaqoteP5 {
     }
 
     fn stroke<C: IntoColor>(&mut self, color: C) {
-        self.stroke_color = color.into(crate::color::RGB).into();
+        self.stroke_color = color.into_color(self.color_mode).into();
     }
 
     fn quad(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, x4: f32, y4: f32) {
@@ -268,6 +286,10 @@ impl P5 for RaqoteP5 {
 
     fn frame_rate(&mut self, fps: f32) {
         self.frame_rate = fps;
+    }
+
+    fn color_mode(&mut self, mode: ColorMode) {
+        self.color_mode = mode;
     }
 
     fn get_data(&self) -> &[u32] {
