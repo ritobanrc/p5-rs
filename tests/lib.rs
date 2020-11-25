@@ -294,6 +294,13 @@ fn colors() {
             p5.stroke((255., 0., 10., 75.));
             p5.ellipse(40., 40., 50., 50.);
             p5.ellipse(50., 50., 40., 40.);
+
+            p5.reset_matrix();
+            p5.translate(0., 120.);
+            p5.stroke(21.);
+            p5.fill((220., 15., 0., 150.));
+            p5.ellipse(40., 40., 50., 50.);
+            p5.ellipse(50., 50., 40., 40.);
         }
     }
 

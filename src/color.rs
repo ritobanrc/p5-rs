@@ -98,9 +98,8 @@ pub trait IntoColor {
 /// will factor in the current `max_3` value in the `ColorMode`, as this appears to be the current
 /// behavior in p5.
 impl IntoColor for f32 {
-    fn into_color(self, _mode: ColorMode) -> Color {
-        assert!(self >= 0. && self <= 1.);
-        let brightness = (self * 255.) as u8;
+    fn into_color(self, mode: ColorMode) -> Color {
+        let brightness = (self / mode.max_3 * 255.) as u8;
         Color::new(brightness, brightness, brightness, 255)
     }
 }

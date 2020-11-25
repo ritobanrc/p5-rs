@@ -172,6 +172,8 @@ pub trait P5 {
     /// using the RGB color model.
     fn color_mode(&mut self, mode: crate::ColorMode);
 
+    fn fill<C: IntoColor>(&mut self, color: C);
+
     fn no_fill(&mut self);
 
     fn get_data(&self) -> &[u32];

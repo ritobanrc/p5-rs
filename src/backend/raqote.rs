@@ -171,6 +171,10 @@ impl P5 for RaqoteP5 {
         self.stroke_color = color.into_color(self.color_mode).into();
     }
 
+    fn fill<C: IntoColor>(&mut self, color: C) {
+        self.fill_color = Some(color.into_color(self.color_mode).into());
+    }
+
     fn quad(&mut self, x1: f32, y1: f32, x2: f32, y2: f32, x3: f32, y3: f32, x4: f32, y4: f32) {
         let mut pb = PathBuilder::new();
         pb.move_to(x1, y1);
