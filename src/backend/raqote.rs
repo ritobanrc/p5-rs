@@ -24,6 +24,11 @@ pub struct RaqoteP5 {
     /// The variable frame_count contains the number of frames that have been displayed since the program started. Inside setup() the value is 0, after the first iteration of draw it is 1, etc.
     pub frame_count: usize,
     pub frame_rate: f32,
+    pub(crate) keys: Option<Vec<crate::Key>>,
+    /// If `Some`, contains the ASCII character value of the most recent key on the keyboard that was typed, _mostly_ respecting capitalization (please file a bug report if you find a sitaution where it doesn't). If this is `None`, that may mean that no key was pressed, or that the key is not an ascii character.
+    pub key: Option<char>,
+    /// If `Some`, contains the most recent key pressed on the keyboard as a [`Key`](crate::Key). Instead of a separate `keyIsPressed` variable, this uses an `Option`.
+    pub key_code: Option<crate::Key>,
 }
 
 impl From<crate::Color> for raqote::Color {
@@ -43,7 +48,11 @@ impl RaqoteP5 {
             transform: Transform2D::identity(),
             color_mode: crate::RGB,
             frame_count: 0,
-            frame_rate: 60., // TODO: p5js docs say the default framerate is based on the monitor refresh rate, but we hard code it to be 60.
+            // TODO: p5js docs say the default framerate is based on the monitor refresh rate, but we hard code it to be 60.
+            frame_rate: 60.,
+            keys: None,
+            key: None,
+            key_code: None,
         }
     }
 
@@ -294,6 +303,12 @@ impl P5 for RaqoteP5 {
 
     fn color_mode(&mut self, mode: ColorMode) {
         self.color_mode = mode;
+    }
+
+    fn key_is_down(&self, key: crate::Key) -> bool {
+        // TODO: Instead of calling `contains`, directly use the `window.is_key_down`
+        // function
+        self.keys.as_ref().map_or(false, |keys| keys.contains(&key))
     }
 
     fn get_data(&self) -> &[u32] {

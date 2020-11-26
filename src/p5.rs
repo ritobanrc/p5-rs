@@ -176,6 +176,8 @@ pub trait P5 {
 
     fn no_fill(&mut self);
 
+    fn key_is_down(&self, key: crate::Key) -> bool;
+
     fn get_data(&self) -> &[u32];
 }
 
