@@ -2,6 +2,7 @@ use crate::p5::{RectMode, P5};
 use crate::Sketch;
 use crate::{ColorMode, IntoColor};
 use euclid::{point2, vec2, Angle, Transform2D, UnknownUnit};
+use font_kit::font::Font;
 use raqote::{DrawOptions, DrawTarget, PathBuilder, Source};
 
 /// A structure that contains all the internal state necessary for drawing with the raqote backend.
@@ -29,6 +30,11 @@ pub struct RaqoteP5 {
     pub key: Option<char>,
     /// If `Some`, contains the most recent key pressed on the keyboard as a [`Key`](crate::Key). Instead of a separate `keyIsPressed` variable, this uses an `Option`.
     pub key_code: Option<crate::Key>,
+
+    /// Sets/gets the current font size. This size will be used in all subsequent calls to the text() function. Font size is measured in _points_.
+    text_size: f32,
+    /// The current font
+    font: Font,
 }
 
 impl From<crate::Color> for raqote::Color {
@@ -53,6 +59,15 @@ impl RaqoteP5 {
             keys: None,
             key: None,
             key_code: None,
+            text_size: 32., // this is what the default text size looks like in p5.js
+            font: font_kit::source::SystemSource::new()
+                .select_best_match(
+                    &[font_kit::family_name::FamilyName::SansSerif],
+                    &font_kit::properties::Properties::default(),
+                )
+                .expect("Default sans-serif font not found")
+                .load()
+                .expect("Failed to load default sans-serif font"),
         }
     }
 
@@ -309,6 +324,44 @@ impl P5 for RaqoteP5 {
         // TODO: Instead of calling `contains`, directly use the `window.is_key_down`
         // function
         self.keys.as_ref().map_or(false, |keys| keys.contains(&key))
+    }
+
+    fn text(&mut self, s: &str, x: f32, y: f32) {
+        if let Some(fill_color) = self.fill_color {
+            let mut options = DrawOptions::new();
+            options.antialias = raqote::AntialiasMode::Gray;
+            self.dt.draw_text(
+                &self.font,
+                self.text_size,
+                s,
+                raqote::Point::new(x, y),
+                &Source::Solid(fill_color.into()),
+                &options,
+            );
+        }
+    }
+
+    fn text_size(&mut self, size: f32) {
+        self.text_size = size;
+    }
+
+    // TODO: Better error handling here
+    fn text_font(&mut self, family_name: &str) {
+        use font_kit::{family_name::FamilyName, properties::Properties, source::SystemSource};
+        let family_name = match family_name {
+            "serif" => FamilyName::Serif,
+            "sans-serif" => FamilyName::SansSerif,
+            "monospace" => FamilyName::Monospace,
+            "cursive" => FamilyName::Cursive,
+            "fantasy" => FamilyName::Fantasy,
+            x => FamilyName::Title(x.to_owned()),
+        };
+
+        self.font = SystemSource::new()
+            .select_best_match(&[family_name], &Properties::default())
+            .expect("Invalid font specified")
+            .load()
+            .expect("Failed to load font.");
     }
 
     fn get_data(&self) -> &[u32] {

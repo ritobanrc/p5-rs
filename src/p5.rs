@@ -178,9 +178,47 @@ pub trait P5 {
 
     fn key_is_down(&self, key: crate::Key) -> bool;
 
+    /// Draws text to the screen. Displays the information specified in the first parameter on the
+    /// screen in the position specified by the additional parameters. A default font will be used
+    /// unless a font is set with the textFont() function and a default size will be used unless a
+    /// font is set with textSize(). Change the color of the text with the fill() function.
+    ///
+    /// TODO: Text outlining is currently not supported
+    /// TODO: x2 and y2 parameters to provide a rectangle to place the text
+    fn text(&mut self, s: &str, x: f32, y: f32);
+
+    /// Sets/gets the current font size. This size will be used in all subsequent calls to the
+    /// text() function. Font size is measured in _points_.
+    ///
+    /// TODO: figure out if we can specify text_size in pixels instead, since that's more
+    /// consistent across devices
+    fn text_size(&mut self, size: f32);
+
+    /// Sets the current font that will be drawn with the text() function.
+    ///
+    /// This invokes the
+    /// [`select_family_by_name`](font_kit::source::SystemSource::select_family_by_name)
+    /// function. If you need more precise control, you can directly load a font using with
+    /// [`font_kit`](font_kit) library and set the `font` variable.
+    ///
+    /// This is a convienient way of listing all the installed font families:
+    /// ```
+    /// dbg!(font_kit::source::SystemSource::new().all_families());
+    /// ```
+    fn text_font(&mut self, family_name: &str);
+
     fn get_data(&self) -> &[u32];
 }
 
+/// Describes a `RectMode`, which is the location from which rectangles are drawn by changing the way in which parameters given to [`rect`](crate::P5Trait::rect) are interpreted.
+///
+/// The default mode is `RectMode::Corner`, which interprets the first two parameters as the upper-left corner of the shape, while the third and fourth parameters are its width and height.
+///
+/// `RectMode::Corners` interprets the first two parameters as the location of one of the corner, and the third and fourth parameters as the location of the diagonally opposite corner. Note, the rectangle is drawn between the coordinates, so it is not neccesary that the first corner be the upper left corner.
+///
+/// `RectMode::Center` interprets the first two parameters as the shape's center point, while the third and fourth parameters are its width and height.
+///
+/// `RectMode::Radius` also uses the first two parameters as the shape's center point, but uses the third and fourth parameters to specify half of the shapes's width and height respectively.
 #[derive(Debug, Copy, Clone, Eq, PartialEq)]
 pub enum RectMode {
     Corner,

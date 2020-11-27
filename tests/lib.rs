@@ -306,3 +306,24 @@ fn colors() {
 
     ColorsTest.run();
 }
+
+#[test]
+fn text() {
+    struct TextTest;
+
+    impl Sketch for TextTest {
+        fn setup(&mut self, p5: &mut P5) {
+            p5.text_size(30.);
+            p5.text_font("Roboto");
+            p5.text("This is Roboto!", 100., 100.);
+
+            p5.text_font("Linux Libertine");
+            p5.text("This is Libertine!", 100., 200.);
+
+            p5.text_font("Fira Code");
+            p5.text("This is Fira Code!", 100., 300.);
+        }
+    }
+
+    TextTest.run();
+}

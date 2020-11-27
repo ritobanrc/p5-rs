@@ -209,6 +209,7 @@ fn hsl_to_rgb(h: f32, s: f32, l: f32) -> [f32; 3] {
 /// This is an alternative implementation of HSB to RGB. It should produce equivalent results to
 /// the more efficient implementation above.
 /// See https://en.wikipedia.org/wiki/HSL_and_HSV#HSV_to_RGB
+#[allow(dead_code)]
 fn hsb_to_rgb_alt(h: f32, s: f32, b: f32) -> [f32; 3] {
     let c = b * s;
     let h_prime = h / 60.;

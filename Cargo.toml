@@ -11,6 +11,7 @@ minifb = "0.19.0"
 raqote = "0.8.0"
 lyon_geom = "0.16.0"
 euclid = "0.22.0"
+font-kit = "0.7.1"
 
 [profile.dev.package.raqote]
 opt-level = 3

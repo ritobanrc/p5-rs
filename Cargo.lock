@@ -479,6 +479,7 @@ name = "p5-rs"
 version = "0.1.0"
 dependencies = [
  "euclid 0.22.1",
+ "font-kit",
  "lyon_geom 0.16.2",
  "minifb",
  "raqote",
